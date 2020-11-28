@@ -29,13 +29,13 @@ while(True):
     if(bytesAddressPair[1][1] == 20001):
         print('sent from server')
         message = bytesAddressPair[0]
-        time.sleep(1)
+        time.sleep(.5)
         UDPSocket.sendto(message, (ClientIP, ClientPort))
     #receves from server
     elif (bytesAddressPair[1][1] == 20002):
         print('Sent from client')
         message = bytesAddressPair[0]
-        time.sleep(1)
+        time.sleep(.25)
         UDPSocket.sendto(message, (ServerIP, ServerPort))
     else:
         print('wtf?')

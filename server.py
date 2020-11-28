@@ -17,20 +17,15 @@ UDPServerSocket.bind((localIP, ServerPortS))
 
 print("UDP server up and listening")
 count = 0
-
 # UDPServerSocket.sendto(str.encode(msgFromServer),(localIP, ServerPortR))
 # Listen for incoming datagrams
-# f = open('newfile.txt', 'w')
+
 while(True):
     bytesAddressPair = UDPServerSocket.recvfrom(bufferSize)
-    message = bytesAddressPair[0]
+    message = struct.unpack('I I 20s I I', bytesAddressPair[0])
     address = bytesAddressPair[1]
-    print(struct.unpack('10s', message))
-    # clientMsg = "Message from Client:{}".format(message)
-    # clientIP = "Client IP Address:{}".format(address)
-    # writing = bytes.decode(message)
-    # print(bytes.decode(message))
-    # print(clientIP)
-    # f.write(writing)
-    UDPServerSocket.sendto(str.encode(str(count)), (localIP, ServerPortR))
-    print('done!') 
+
+    packet = struct.pack('I I 20s I I', 3, count, b'recived', 3, message[4])
+    UDPServerSocket.sendto(packet, (localIP, ServerPortR))
+    count += 1
+    print('done!')
