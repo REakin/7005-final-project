@@ -20,7 +20,6 @@ UDPSocket = socket.socket(family=socket.AF_INET, type=socket.SOCK_DGRAM)
 # Bind to address and ip
 UDPSocket.bind((ServerIP, RecevingPort))
 print("UDP server up and listening")
-
 # Listen for incoming datagrams
 while(True):
     bytesAddressPair = UDPSocket.recvfrom(bufferSize)

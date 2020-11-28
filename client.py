@@ -1,5 +1,6 @@
 import socket
 import struct
+import time
 from threading import Thread, Event, local
 localdata = local()
 msgFromClient = b'Hello UDP Server'
@@ -33,7 +34,17 @@ localdata.ackedpackets = []
 msg = ''
 
 
-def sendpackets(ackedpackets):
+def checktimeout(ackedpackets, count):
+    print('setting timeout period')
+    time.sleep(5)
+    if(count not in ackedpackets):
+        print('packet not found resending:'+str(count))
+        packet = struct.pack('I I 20s I I', 2, 1, data[count], 3, count)
+        UDPSocket.sendto(packet, (localIP, ClientPortR))
+    else:
+        print('packet acked'+str(count))
+
+def sendPackets(ackedpackets):
     lastSeqAck=0
     count = 0
     while(data):
@@ -45,11 +56,14 @@ def sendpackets(ackedpackets):
         if(count<=lastSeqAck+windowSize):
             packet = struct.pack('I I 20s I I', 2, 1, data[count], 3, count)
             UDPSocket.sendto(packet, (localIP, ClientPortR))
+            new_Thread = Thread(target=checktimeout, args=(ackedpackets, count,))
+            new_Thread.start()
             count += 1
             print('Sending packet:'+str(count))
 
+
 # Sending a reply to client
-action_thread = Thread(target=sendpackets, args=(localdata.ackedpackets,))
+action_thread = Thread(target=sendPackets, args=(localdata.ackedpackets,))
 action_thread.start()
 while(True):
     print('ran')
