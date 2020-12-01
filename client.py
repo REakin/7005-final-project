@@ -15,7 +15,7 @@ bufferSize = 1024
 windowSize = 3
 
 #initialize transfer data
-f = open('alice.txt', 'rb')
+f = open('DTRH.txt', 'rb')
 data = []
 l = f.read(20)
 while(l):
@@ -41,25 +41,32 @@ def checktimeout(ackedpackets, count):
         print('packet not found resending:'+str(count))
         packet = struct.pack('I I 20s I I', 2, 1, data[count], 3, count)
         UDPSocket.sendto(packet, (localIP, ClientPortR))
+        new_Thread = Thread(target=checktimeout, args=(ackedpackets, count,))
+        new_Thread.start()
     else:
-        print('packet acked'+str(count))
+        print('packet acked: '+str(count))
+
 
 def sendPackets(ackedpackets):
     lastSeqAck=0
     count = 0
-    while(data):
+    while(True):
         for i in ackedpackets:
             if i == lastSeqAck+1:
                 lastSeqAck += 1
                 print('moving window position')
 
         if(count<=lastSeqAck+windowSize):
-            packet = struct.pack('I I 20s I I', 2, 1, data[count], 3, count)
-            UDPSocket.sendto(packet, (localIP, ClientPortR))
-            new_Thread = Thread(target=checktimeout, args=(ackedpackets, count,))
-            new_Thread.start()
-            count += 1
-            print('Sending packet:'+str(count))
+            try:
+                packet = struct.pack('I I 20s I I', 2, 1, data[count], 3, count)
+                UDPSocket.sendto(packet, (localIP, ClientPortR))
+                new_Thread = Thread(target=checktimeout, args=(ackedpackets, count,))
+                new_Thread.start()
+                count += 1
+                print('Sending packet: '+str(count))
+            except(IndexError):
+                break
+    print('finished')
 
 
 # Sending a reply to client

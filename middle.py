@@ -30,28 +30,30 @@ while(True):
     print(bytesAddressPair[1][1])    
     #receives from client
     if(bytesAddressPair[1][1] == 20001):
+        print('sent from server')
         message = bytesAddressPair[0]
-        if(round(random.uniform(0, 1.0),2) <= dropChance):
+        if(round(random.uniform(0, 1.0), 2) <= dropChance):
             msg = struct.unpack('I I 20s I I', message)
             print('packet ' + str(msg[4]) + ' dropped')
             #if you're wanting it to go through, its
             #message = struct.pack('I I 20s I I', msg[0], msg[1], msg[2], msg[3], msg[4])
-            message = struct.pack('I I 20s I I', 0, 0, b'', 0, 0)
-        print('sent from server')
-        UDPSocket.sendto(message, (ClientIP, ClientPort))
-        time.sleep(.5)
+            #message = struct.pack('I I 20s I I', 0, 0, b'', 0, 0)
+        else:
+            time.sleep(.5)
+            UDPSocket.sendto(message, (ClientIP, ClientPort))
 
     #receves from server
     elif (bytesAddressPair[1][1] == 20002):
         print('Sent from client')
         message = bytesAddressPair[0]
-        if(round(random.uniform(0, 1.0),2) <= dropChance):
+        if(round(random.uniform(0, 1.0), 2) <= dropChance):
             msg = struct.unpack('I I 20s I I', message)
             print('packet ' + str(msg[4]) + ' dropped')
             #if you're wanting it to go through, its
             #message = struct.pack('I I 20s I I', msg[0], msg[1], msg[2], msg[3], msg[4])
-            message = struct.pack('I I 20s I I', 0, 0, b'', 0, 0)
-        time.sleep(.25)
-        UDPSocket.sendto(message, (ServerIP, ServerPort))
+            #message = struct.pack('I I 20s I I', 0, 0, b'', 0, 0)
+        else:
+            time.sleep(.25)
+            UDPSocket.sendto(message, (ServerIP, ServerPort))
     else:
         print('wtf?')
