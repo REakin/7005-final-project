@@ -19,7 +19,7 @@ bytesToSend = str.encode(msgFromServer)
 UDPServerSocket = socket.socket(family=socket.AF_INET, type=socket.SOCK_DGRAM)
 
 # Bind to address and ip
-UDPServerSocket.bind((localIP, ServerPortS))
+UDPServerSocket.bind(("0.0.0.0", ServerPortS))
 
 print("UDP server up and listening")
 count = 0
@@ -44,7 +44,7 @@ while(True):
         print('EOT packet recived: seqnum '+str(message[1]))
         packet = struct.pack('I I 20s I I', 3, message[1], b'recived', 3, message[1])
         UDPServerSocket.sendto(packet, (localIP, ServerPortR))
-        #recreate file from list of packet messages
+  
 
 
     # print('Packet Recived: '+str(message[4]))

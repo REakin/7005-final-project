@@ -26,15 +26,15 @@ bytesToSend = str.encode(msgFromServer)
 UDPSocket = socket.socket(family=socket.AF_INET, type=socket.SOCK_DGRAM)
 
 # Bind to address and ip
-UDPSocket.bind((ServerIP, RecevingPort))
+UDPSocket.bind(("0.0.0.0", RecevingPort))
 print("UDP server up and listening")
 # Listen for incoming datagrams
 while(True):
     bytesAddressPair = UDPSocket.recvfrom(bufferSize)
-    #print(bytesAddressPair[1][1])
+    print(bytesAddressPair[1][1])
     #received from server
     if(bytesAddressPair[1][1] == 20001):
-        print('ACK packet recived from server')
+        print('packet recived from server')
         message = bytesAddressPair[0]
         time.sleep(cfg['middle']['transfer']['delay'])
         if(round(random.uniform(0, 1.0), 2) <= dropChance):
@@ -46,7 +46,7 @@ while(True):
     #receved from client
     elif (bytesAddressPair[1][1] == 20002):
         message = bytesAddressPair[0]
-        print('DATA packet recived from client')
+        print('packet recived from client')
         time.sleep(cfg['middle']['transfer']['delay'])
         if(round(random.uniform(0, 1.0), 2) <= dropChance):
             msg = struct.unpack('I I 20s I I', message)

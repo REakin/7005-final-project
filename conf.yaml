@@ -1,17 +1,17 @@
 client:
   connection:
-    recivingPort: 20003
-    sendingPort: 20002
-    DestIP: 127.0.0.1
+    recivingPort: 20002
+    sendingPort: 20003
+    DestIP: "192.168.1.77"
   transfer:
     windowSize: 10
     targetFile: "DTRH.txt"
     timeoutPeriod: 10
 middle:
   connection:
-    serverIP: 127.0.0.1
+    serverIP: "192.168.1.77"
     serverPort: 20001
-    clientIP: 127.0.0.1
+    clientIP: "192.168.1.77"
     clientPort: 20002
     recivingPort: 20003
   transfer:
@@ -21,4 +21,4 @@ server:
   connection:
     recivingPort: 20003
     sendingPort: 20001
-    DestIP: 127.0.0.1
+    DestIP: "192.168.1.77"

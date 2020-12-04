@@ -32,7 +32,7 @@ print(len(data))
 # Create a UDP socket at client side
 UDPSocket = socket.socket(family=socket.AF_INET, type=socket.SOCK_DGRAM)
 # Bind to address and ip
-UDPSocket.bind((localIP, ClientPortS))
+UDPSocket.bind(("0.0.0.0", ClientPortR))
 # Send to server using created UDP socket
 UDPSocket.sendto(bytesToSend, (localIP, ClientPortR))
 localdata.ackedpackets = []
@@ -45,7 +45,7 @@ def checktimeout(ackedpackets, count):
     if(count not in ackedpackets):
         print('packet not found resending:'+str(count))
         packet = struct.pack('I I 20s I I', 2, count, data[count], 3, 0)
-        UDPSocket.sendto(packet, (localIP, ClientPortR))
+        UDPSocket.sendto(packet, (localIP, ClientPortS))
         new_Thread = Thread(target=checktimeout, args=(ackedpackets, count,))
         new_Thread.start()
 
