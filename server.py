@@ -1,9 +1,14 @@
 import socket
 import struct
-localIP = "127.0.0.1"
+import yaml
 
-ServerPortR = 20003
-ServerPortS = 20001
+with open("conf.yaml", "r") as ymlfile:
+    cfg = yaml.load(ymlfile)
+
+localIP = cfg['server']['connection']['DestIP']
+
+ServerPortR = cfg['server']['connection']['recivingPort']
+ServerPortS = cfg['server']['connection']['sendingPort']
 
 bufferSize = 1024
 
@@ -25,7 +30,21 @@ while(True):
     bytesAddressPair = UDPServerSocket.recvfrom(bufferSize)
     message = struct.unpack('I I 20s I I', bytesAddressPair[0])
     address = bytesAddressPair[1]
-    print('Packet Recived: '+str(message[4]))
-    packet = struct.pack('I I 20s I I', 3, count, b'recived', 3, message[4])
-    UDPServerSocket.sendto(packet, (localIP, ServerPortR))
-    count += 1
+    if(message[0]==1):
+        print('syn packet recived')
+        windowSize = message[3]
+        packet = struct.pack('I I 20s I I', 1, count, b'recived', 3, 0)
+        UDPServerSocket.sendto(packet, (localIP, ServerPortR))
+    if(message[0]==2):
+        print('data packet recived: seqnum '+str(message[1]))
+        packet = struct.pack('I I 20s I I', 3, message[1], b'recived', 3, message[1])
+        UDPServerSocket.sendto(packet, (localIP, ServerPortR))
+        count += 1
+    if(message[0]==4):
+        print('EOT packet recived: seqnum '+str(message[1]))
+        packet = struct.pack('I I 20s I I', 3, message[1], b'recived', 3, message[1])
+        UDPServerSocket.sendto(packet, (localIP, ServerPortR))
+        #recreate file from list of packet messages
+
+
+    # print('Packet Recived: '+str(message[4]))

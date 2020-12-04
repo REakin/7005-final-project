@@ -2,18 +2,22 @@ import random
 import socket
 import struct
 import time
+import yaml
 
-ServerIP = "127.0.0.1"
-ClientIP = "127.0.0.1"
+with open("conf.yaml", "r") as ymlfile:
+    cfg = yaml.load(ymlfile)
 
-ServerPort = 20001
-ClientPort = 20002
 
-RecevingPort = 20003
+ServerIP = cfg['middle']['connection']['serverIP']
+ClientIP = cfg['middle']['connection']['clientIP']
+
+ServerPort = cfg['middle']['connection']['serverPort']
+ClientPort = cfg['middle']['connection']['clientPort']
+
+RecevingPort = cfg['middle']['connection']['recivingPort']
 
 bufferSize = 1024
-
-dropChance = 0.1
+dropChance = cfg['middle']['transfer']['BER']
 
 msgFromServer = "Hello UDP Client"
 bytesToSend = str.encode(msgFromServer)
@@ -27,33 +31,27 @@ print("UDP server up and listening")
 # Listen for incoming datagrams
 while(True):
     bytesAddressPair = UDPSocket.recvfrom(bufferSize)
-    print(bytesAddressPair[1][1])    
-    #receives from client
+    #print(bytesAddressPair[1][1])
+    #received from server
     if(bytesAddressPair[1][1] == 20001):
-        print('sent from server')
+        print('ACK packet recived from server')
         message = bytesAddressPair[0]
+        time.sleep(cfg['middle']['transfer']['delay'])
         if(round(random.uniform(0, 1.0), 2) <= dropChance):
             msg = struct.unpack('I I 20s I I', message)
-            print('packet ' + str(msg[4]) + ' dropped')
-            #if you're wanting it to go through, its
-            #message = struct.pack('I I 20s I I', msg[0], msg[1], msg[2], msg[3], msg[4])
-            #message = struct.pack('I I 20s I I', 0, 0, b'', 0, 0)
+            print('ACK packet ' + str(msg[4]) + ' dropped')
         else:
-            time.sleep(.5)
             UDPSocket.sendto(message, (ClientIP, ClientPort))
 
-    #receves from server
+    #receved from client
     elif (bytesAddressPair[1][1] == 20002):
-        print('Sent from client')
         message = bytesAddressPair[0]
+        print('DATA packet recived from client')
+        time.sleep(cfg['middle']['transfer']['delay'])
         if(round(random.uniform(0, 1.0), 2) <= dropChance):
             msg = struct.unpack('I I 20s I I', message)
-            print('packet ' + str(msg[4]) + ' dropped')
-            #if you're wanting it to go through, its
-            #message = struct.pack('I I 20s I I', msg[0], msg[1], msg[2], msg[3], msg[4])
-            #message = struct.pack('I I 20s I I', 0, 0, b'', 0, 0)
+            print('DATA packet ' + str(msg[1]) + ' dropped')
         else:
-            time.sleep(.25)
             UDPSocket.sendto(message, (ServerIP, ServerPort))
     else:
-        print('wtf?')
+        print('error')
